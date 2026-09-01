@@ -11,7 +11,7 @@ int main() {
         return 1;
     }
 
-    struct sockaddr_in addr = {};
+    sockaddr_in addr = {};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(8080);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -27,5 +27,16 @@ int main() {
         std::cerr << "Problems with listening" << std::endl;
         return 1;
     }
+
+    while (true) {
+        int client_descriptor = accept(file_descriptor, nullptr, nullptr);
+        if (client_descriptor == -1) {
+            std::cerr << "Problems with accept" << std::endl;
+            return 1;
+        }
+        write(client_descriptor, "OK\n", 3);
+        close(client_descriptor);
+    }
+
     return 0;
 }

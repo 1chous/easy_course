@@ -1,25 +1,32 @@
 package main
 
 import (
-	"fmt"
+	"io"
+	"log"
 	"net"
-	"os"
 )
 
 func main() {
 	ln, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
-		fmt.Println("Error with listen:", err)
-		os.Exit(1)
+		log.Fatal("Error with listen:", err)
 	}
 	defer ln.Close()
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
-			fmt.Println("Error with accept:", err)
+			log.Println("Error with accept:", err)
 			continue
 		}
-		conn.Write([]byte("OK\n"))
-		conn.Close()
+		cnt, err := io.WriteString(conn, "OK\n")
+		if err != nil {
+			log.Println("Error with write:", err)
+		} else if cnt != len("OK\n") {
+			log.Println("Error with cnt bytes:", cnt)
+		}
+		err = conn.Close()
+		if err != nil {
+			log.Println("Error with close descriptor:", err)
+		}
 	}
 }
